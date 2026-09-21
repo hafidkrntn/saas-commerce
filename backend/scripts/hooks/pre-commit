@@ -1,0 +1,77 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+# --- Wire Check & Regenerate ---
+GOTOOLCHAIN=go1.25.7 go run github.com/google/wire/cmd/wire@latest gen ./cmd/api/ 2>&1
+WIRE_EXIT=$?
+
+if [ $WIRE_EXIT -ne 0 ]; then
+  echo ""
+  echo "❌ WIRE GEN FAILED. Commit aborted!"
+  echo "📋 Check wire.go for errors"
+  exit 1
+fi
+
+# Auto-stage wire_gen.go if regenerated
+if ! git diff --quiet -- cmd/api/wire_gen.go; then
+  echo "⚡ wire_gen.go regenerated — staging..."
+  git add cmd/api/wire_gen.go
+fi
+
+# --- Build Check ---
+rm -rf tmp/app
+mkdir -p tmp
+
+BUILD_OUTPUT=$(go build -o tmp/app ./cmd/api 2>&1)
+BUILD_EXIT=$?
+
+if [ $BUILD_EXIT -ne 0 ]; then
+  echo ""
+  echo "❌ BUILD FAILED. Commit aborted!"
+  echo "📋 Error details:"
+  echo "$BUILD_OUTPUT"
+  rm -rf tmp
+  exit 1
+fi
+
+rm -rf tmp
+
+# --- Lint Check ---
+if command -v golangci-lint &> /dev/null; then
+  LINT_OUTPUT=$(golangci-lint run ./... 2>&1)
+  LINT_EXIT=$?
+
+  if [ $LINT_EXIT -ne 0 ]; then
+    echo ""
+    echo "❌ LINT FAILED. Commit aborted!"
+    echo "📋 Fix these issues:"
+    echo "$LINT_OUTPUT"
+    exit 1
+  fi
+else
+  echo "⚠️  golangci-lint not installed, skipping lint check"
+  echo "   Install: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+fi
+
+# --- Test Check (only if test files exist) ---
+TEST_FILES=$(find . -name "*_test.go" -not -path "./vendor/*" 2>/dev/null)
+
+if [ -n "$TEST_FILES" ]; then
+  echo "🧪 Test files detected, running tests..."
+  TEST_OUTPUT=$(go test ./... -count=1 2>&1)
+  TEST_EXIT=$?
+
+  if [ $TEST_EXIT -ne 0 ]; then
+    echo ""
+    echo "❌ TESTS FAILED. Commit aborted!"
+    echo "📋 Fix these tests:"
+    echo "$TEST_OUTPUT"
+    exit 1
+  fi
+  echo "✅ Tests passed"
+else
+  echo "⏭️  No test files found, skipping tests"
+fi
+
+echo "✅ All checks passed. Committing..."

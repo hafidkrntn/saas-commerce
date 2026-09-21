@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.13 0.04 260);
+  --color-primary: #2563eb;
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-primary-light: #dbeafe;
+  --color-secondary: oklch(0.96 0.01 260);
+  --color-secondary-foreground: oklch(0.21 0.04 260);
+  --color-muted: oklch(0.965 0.005 260);
+  --color-muted-foreground: oklch(0.55 0.03 260);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.13 0.04 260);
+  --color-card-hover: oklch(0.98 0.005 260);
+  --color-border: oklch(0.91 0.01 260);
+  --color-input: oklch(0.93 0.01 260);
+  --color-ring: #2563eb;
+  --color-accent: oklch(0.96 0.01 260);
+  --color-accent-foreground: oklch(0.21 0.04 260);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.13 0.04 260);
+  --color-destructive: oklch(0.58 0.24 25);
+  --color-destructive-foreground: oklch(0.985 0 0);
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-sidebar: oklch(0.995 0 0);
+  --color-sidebar-foreground: oklch(0.13 0.04 260);
+  --color-sidebar-border: oklch(0.91 0.01 260);
+  --color-sidebar-accent: oklch(0.96 0.01 260);
+  --color-sidebar-accent-foreground: oklch(0.21 0.04 260);
+  --color-chart-1: #2563eb;
+  --color-chart-2: #059669;
+  --color-chart-3: #d97706;
+  --color-chart-4: #dc2626;
+  --color-chart-5: #7c3aed;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius: 0.75rem;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+  opacity: 0.5;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
